@@ -5,10 +5,7 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
     private AudioSource audioSource;
     public bool sound = true;
-    void Start()
-    {
 
-    }
     private void Awake()
     {
         makeSingleton();
@@ -27,9 +24,10 @@ public class SoundManager : MonoBehaviour
             DontDestroyOnLoad(instance);
         }
     }
-    public void SoundOnOf()
+    public void SoundOnOff()
     {
         sound = !sound;
+        print("sound" + sound);
     }
 
     public void playSoundFX(AudioClip audioClip, float volume)
@@ -41,8 +39,4 @@ public class SoundManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

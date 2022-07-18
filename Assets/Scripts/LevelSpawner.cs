@@ -10,6 +10,7 @@ public class LevelSpawner : MonoBehaviour
     public GameObject[] obstaclePrefabs = new GameObject[4];
 
     public GameObject winPrefab;
+    public GameUIController gameUIController;
 
     private GameObject temp1Obstacle, temp2Obstacle;
     public int level = 1;
@@ -21,8 +22,10 @@ public class LevelSpawner : MonoBehaviour
     private void Awake()
     {
         randomObstacleGenerator();
-
         level = PlayerPrefs.GetInt("Level", 1);
+        gameUIController.scoreText.text = ScoreManager.instance.score.ToString();
+        gameUIController.nextLevelText.text = (level + 1).ToString();
+
         float randomHardness = Random.value;
         for (obstacleNumber = 0; obstacleNumber > -level - addNumber; obstacleNumber -= 0.5f)
         {
@@ -52,15 +55,6 @@ public class LevelSpawner : MonoBehaviour
 
         temp2Obstacle = Instantiate(winPrefab);
         temp2Obstacle.transform.position = new Vector3(0, temp1Obstacle.transform.position.y - 0.5f, 0);
-    }
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
     }
     public void nextLevel()
     {

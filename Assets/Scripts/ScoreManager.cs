@@ -4,9 +4,21 @@ using TMPro;
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager instance;
-    public int score;
-    private TextMeshProUGUI _scoreText;
+    public GameUIController gameUIController;
+    public int score = 0;
 
+    private void Awake()
+    {
+        makeSingleton();
+        if (gameUIController.scoreText == null)
+        {
+            gameUIController.scoreText.text = "0";
+        }
+        else
+        {
+            gameUIController.scoreText.text = score.ToString();
+        }
+    }
     private void makeSingleton()
     {
         if (instance != null)
@@ -20,25 +32,16 @@ public class ScoreManager : MonoBehaviour
             DontDestroyOnLoad(this);
         }
     }
-    private void Awake()
-    {
-        makeSingleton();
-        Debug.Log(_scoreText);
-        if (_scoreText == null)
-        {
-            _scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
-            _scoreText.text = "0";
-        }
-    }
 
     public void addScore(int value)
     {
+        gameUIController.scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
         score += value;
         if (score > PlayerPrefs.GetInt("HighScore", 0))
         {
             PlayerPrefs.SetInt("HighScore", score);
         }
-        _scoreText.text = score.ToString();
+        gameUIController.scoreText.text = score.ToString();
     }
     public void ResetScore()
     {

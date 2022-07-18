@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum PlayerState
 {
@@ -15,12 +16,16 @@ public class PlayerController : MonoBehaviour
     float currentTime;
     bool invincible = false;
     public ParticleSystem fireEffect;
+    public bool finishAnim = false;
 
     [SerializeField]
     AudioClip win, death, idestroy, destroy, bounce;
 
     public int currentObstacleNumber;
     public int totalObstacleNumber;
+    public Image invincibleImage;
+    public CameraController _cameraController;
+    private bool invincibleIncreasing;
 
     [HideInInspector]
     public PlayerState playerState = PlayerState.Prepare;
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        setInvincibleRadialBar(currentTime);
         if (playerState == PlayerState.Playing)
         {
             if (Input.GetMouseButtonDown(0))
@@ -56,8 +62,8 @@ public class PlayerController : MonoBehaviour
                 {
                     fireEffect.gameObject.SetActive(true);
                 }
-                print("invincible");
                 currentTime -= Time.deltaTime * 0.35f;
+                invincibleIncreasing = false;
             }
             else
             {
@@ -68,10 +74,12 @@ public class PlayerController : MonoBehaviour
                 if (isTouch)
                 {
                     currentTime += Time.deltaTime * 0.8f;
+                    invincibleIncreasing = true;
                 }
                 else
                 {
                     currentTime -= Time.deltaTime * 0.5f;
+                    invincibleIncreasing = false;
                 }
             }
 
@@ -86,21 +94,20 @@ public class PlayerController : MonoBehaviour
                 invincible = false;
             }
         }
-        if (playerState == PlayerState.Prepare)
-        {
-            if (Input.GetMouseButton(0))
-            {
-                playerState = PlayerState.Playing;
-            }
-        }
         if (playerState == PlayerState.Finish)
         {
-            if (Input.GetMouseButton(0))
             {
                 FindObjectOfType<LevelSpawner>().nextLevel();
             }
         }
 
+    }
+
+    public void setInvincibleRadialBar(float value)
+    {
+        if (invincibleIncreasing) invincibleImage.color = Color.green;
+        else invincibleImage.color = Color.yellow;
+        invincibleImage.fillAmount = value;
     }
     public void getScore()
     {
@@ -158,15 +165,17 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        Debug.Log("currentObstacleNumber = " + currentObstacleNumber);
-        Debug.Log("totalObstacleNumber = " + totalObstacleNumber);
+        // Debug.Log("currentObstacleNumber = " + currentObstacleNumber);
+        // Debug.Log("totalObstacleNumber = " + totalObstacleNumber);
 
-        FindObjectOfType<GameUI>().LevelSliderFill(currentObstacleNumber / (float)totalObstacleNumber);
+        FindObjectOfType<GameUIController>().LevelSliderFill(currentObstacleNumber / (float)totalObstacleNumber);
 
         if (collision.gameObject.tag == "Finish" && playerState == PlayerState.Playing)
         {
+
             playerState = PlayerState.Finish;
             SoundManager.instance.playSoundFX(win, 0.5f);
+            StartCoroutine(_cameraController.finishCam());
         }
     }
 
